@@ -264,7 +264,8 @@
         $(document).ready(function () {
             // HTML 문서를 로드할 때마다 실행합니다.
             getMessages();
-        })
+            console.log("않이 웨 안도ㅔ;");
+        }
 
         // 메모를 불러와서 보여줍니다.
         function getMessages() {
@@ -275,15 +276,18 @@
                 type: 'GET',
                 url: '/api/memos',
                 success: function (response) {
+
                     for (let i = 0; i< response.length; i++) {
-                    let memo = response[i];
-                    let id = memo.id;
-                    let username = memo.username;
-                    let contents = memo.contents;
-                    let modifiedAt = memo.modifiedAt;
-                    addHTML(id, username, contents, modifiedAt);
+                        let memo = response[i];
+                        let id = memo.id;
+                        let username = memo.username;
+                        let contents = memo.contents;
+                        let modifiedAt = memo.modifiedAt;
+                        addHTML(id, username, contents, modifiedAt);
+                    }
+
                 }
-            })
+            });
         }
 
         // 메모 하나를 HTML로 만들어서 body 태그 내 원하는 곳에 붙입니다.
@@ -373,6 +377,8 @@
             $.ajax({
                 type: "DELETE",
                 url: `/api/memos/${id}`,
+                contentType: "application/json",
+                data: JSON.stringify(data),
                 success: function (response) {
                     alert('메시지 삭제에 성공하였습니다.');
                     window.location.reload();
