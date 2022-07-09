@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/neodgm/neodgm-webfont@1.530/neodgm_code/style.css">
+
+    <meta property="og:title" content="Cyworld 순이의 미니홈피" />
+    <meta property="og:description" content="ㄴr는 ㄱr끔 눈물을 흘린⊂ト..." />
+    <meta property="og:image" content="images/cyworld.png" />
+
+    <title>순이의 미니홈피</title>
+
+    <style>
+        @import url('//cdn.jsdelivr.net/gh/neodgm/neodgm-webfont@1.530/neodgm_code/style.css');
+        /** { font-family: 'NeoDunggeunmo Code'; }*/
+
+        .total {
+            margin: 0 auto 0 auto;
+            min-width:500px;
+            max-width: 640px;
+            height: 130%;
+            background-color: #F6F6F6;
+
+        }
+
+        .setting {
+            min-height:72.1px;
+            width:auto;
+            max-width:100%;
+            margin-bottom: -8px;
+        }
+
+        .top {
+            background-color: white;
+            border-radius: 20px;
+            padding: 5px 5px 0 5px;
+            min-width:480px;
+            width:90%;
+            margin: -10px auto 10px auto;
+        }
+        .soone {
+            display: flex;
+            flex-direction: row;
+            align-items: normal;
+            justify-content: left;
+        }
+        .soone img{
+            border-radius: 45px;
+            min-height:130px;
+            width:auto;
+            max-width:28%;
+            margin: 10px;
+        }
+
+        .condition {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .miniroom {
+            background-color: white;
+            border-radius: 20px;
+            padding: 5px 5px 10px 5px;
+            min-width:480px;
+            width:90%;
+            margin: 0 auto 10px auto;
+        }
+
+        .comments {
+            background-color: white;
+            border-radius: 20px;
+            padding: 5px 5px 10px 10px;
+            min-width:475px;
+            width:90%;
+            height:auto;
+            margin: 0 auto 10px auto;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            margin: -5px auto -5px auto;
+        }
+
+        .comment {
+            margin-left: 13px;
+        }
+
+        .posting {
+            margin-top: 20px;
+            min-width: 435px;
+            margin-left:13px;
+            border-bottom: lightgray solid 2px ;
+        }
+
+        .title {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom:10px;
+        }
+
+        .postingbtn {
+            transition: all 0.2s linear;
+            width:25px;
+            height:auto;
+            margin-right:27px;
+        }
+
+        .postingbtn:hover {
+            transform: scale(1.4);
+            cursor: pointer;
+        }
+
+        .edit {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: end;
+            margin-bottom: 10px;
+        }
+
+        .finalcover{
+            border-top: lightgray solid 1px ;
+            min-width: 430px;
+            max-width: 28%;
+            display:none;
+        }
+
+        .final2:hover {
+            cursor:pointer;
+            font-weight: bolder;
+            font-size: larger;
+        }
+
+        .password {
+            display: none;
+        }
+
+        .editing {
+            display: none;
+        }
+
+        .delete {
+            display: none;
+        }
+
+        .origin2 {
+            display: none;
+        }
+
+        .edit button {
+            background-color: transparent;
+            border-color: transparent;
+            margin-left: 5px;
+            margin-right:-5px;
+        }
+
+        .edit button:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+    <script>
+        //내용 공란인지 확인
+        function isValidContents(content) {
+            if (content == '') {
+                alert('내용을 입력해주세요');
+                return false;
+            }
+            return true;
+            }
+
+        function showContent(id) {
+            $(`#${id}-finalcover`).show();
+            $(`#${id}-edit1`).show();
+            $(`#${id}-delete1`).show();
+        }
+
+        function editPost(id) {
+            showEdit(id);
+            let title = $(`#${id}-title1`).text().trim();
+            $(`#${id}-title`).val(title);
+            let content = $(`#${id}-content1`).text().trim();
+            $(`#${id}-content`).val(content);
+        }
+
+
+        function showEdit(id) {
+            $(`#${id}-origin2`).show();
+            $(`#${id}-password`).show();
+            $(`#${id}-edit2`).show();
+            $(`#${id}-delete2`).show();
+
+            $(`#${id}-origin1`).hide();
+            $(`#${id}-edit1`).hide();
+            $(`#${id}-delete1`).hide();
+        }
+
+        function showDelete(id) {
+            $(`#${id}-password`).show();
+            $(`#${id}-delete2`).show();
+
+            $(`#${id}-edit1`).hide();
+            $(`#${id}-delete1`).hide();
+        }
+
+        $(document).ready(function () {
+            getPostings();
+        })
+
+        function getPostings() {
+            $.ajax({
+                type: 'GET',
+                url: '/api/postings',
+                success: function (response) {
+
+                    for (let i = 0; i< response.length; i++) {
+                        let posting = response[i];
+                        let title = posting.title;
+                        let username = posting.username;
+                        let content = posting.content;
+                        let createdAt = posting.createdAt;
+                        let id = posting.id;
+                        addHTML(title, username, content, createdAt,id);
+                    }
+
+                }
+            });
+        }
+
+        function addHTML(title, username, content, createdAt, id) {
+            let tempHtml = `<div class="posting">
+                <div class="title">
+                    <span style="font-size: 13px;">🐶 ${username}</span>
+                    <span style="font-size: 12px;">${createdAt}</span>
+                </div>
+                <div id="${id}-origin1">
+                    <b  class="final2" onclick="showContent('${id}')" id="${id}-title1">${title}</b><br>
+                    <div class="finalcover" id="${id}-finalcover">
+                        <span class="final" id="${id}-content1" style="font-size: 13px;">${content}</span>
+                    </div>
+                </div>
+                <div class ="origin2" id="${id}-origin2">
+                    <input style="width:427px;" type="text" id="${id}-title" placeholder="제목"><br>
+                    <textarea  style="width:430px; height:50px; resize: none; margin-top:3px;" id="${id}-content"  placeholder="내용"></textarea><br>
+                </div>
+                <div class="edit">
+                    <input id="${id}-password" type="text" class="password" placeholder="비밀번호">
+                    <button id="${id}-edit1" style="display:none;" onclick="editPost('${id}')">수정</button>
+                    <button id="${id}-delete1" style="display:none;" onclick="showDelete('${id}')">삭제</button>
+                    <button id="${id}-edit2" onclick="updatePosting('${id}')" class="editing">수정</button>
+                    <button id="${id}-delete2" onclick="deletePosting('${id}')" class="delete">삭제</button>
+                </div>
+                </div>`;
+            // 2. #cards-box 에 HTML을 붙인다.
+            $('#postings-box').append(tempHtml);
+        }
+
+        function createPosting() {
+            let content = $('#content').val();
+            if (isValidContents(content) == false) {
+                return;
+            }
+            let username = $('#username').val();
+            let title = $('#title').val();
+            let password = $('#password').val();
+            let data = {'username': username, 'content': content,
+                'title' : title, 'password': password};
+            $.ajax({
+                type: "POST",
+                url: "/api/postings",
+                contentType: "application/json", // JSON 형식으로 전달함을 알리기
+                data: JSON.stringify(data),
+                success: function (response) {
+                    alert('방명록이 성공적으로 등록되었습니다!');
+                    window.location.reload();
+                }
+            });
+        }
+
+        function deletePosting(id) {
+            let password = $(`#${id}-password`).val().trim();
+            let data = {'password': password }
+            $.ajax({
+                type: "DELETE",
+                url: `/api/postings/${id}`,
+                contentType: "application/json", // JSON 형식으로 전달함을 알리기
+                data: JSON.stringify(data),
+                success: function (response) {
+                    window.location.reload();
+                }
+            })
+        }
+
+        function updatePosting(id) {
+            let title = $(`#${id}-title`).val().trim();
+            let content = $(`#${id}-content`).val().trim();
+            let password = $(`#${id}-password`).val().trim();
+            if (isValidContents(content) == false) {
+                return;
+            }
+            let data = {'title': title, 'content':content, 'password':password};
+            $.ajax({
+                type: "PUT",
+                url: `/api/postings/${id}`,
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    window.location.reload();
+                }
+            });
+        }
+
+    </script>
+
+</head>
+
+
+<body>
+    <div class="total">
+        <img class="setting"  src="images/top.png" alt="">
+        <h2 style="color: dimgray; font-family: 'NeoDunggeunmo Code'; margin-left:5px;">&nbsp;【♥‥수ĿΙ는 산책○l 조오ŀ‥♥】</h2>
+        <div class="top">
+            <div class="soone">
+                <img src="images/soone.jpg" alt="">
+                <div class="myinfo">
+                    <p style="font-family: 'NeoDunggeunmo Code';">TODAY <span style="color: darkorange;">1</span> | 622 </p>
+                    <strong style="font-size: large;">순이</strong>
+                    <br>ㄴr는 ㄱr끔 눈물을 흘린⊂ト...
+                </div>
+            </div>
+            <div class="condition" style="font-family: 'NeoDunggeunmo Code';">
+                <p style="color: dodgerblue;">&nbsp;TODAY IS.. 🦴</p>
+                <p style="margin-right:10px;"><span style="color: dodgerblue;">일촌</span> 95
+                    <span style="color: dodgerblue;">&nbsp;&nbsp;즐겨찾기</span> 0  </p>
+            </div>
+        </div>
+
+        <div class="miniroom">
+            <p style="color: dodgerblue; font-family: 'NeoDunggeunmo Code';font-size:20px; margin-left:9px;">Mini Room</p>
+            <img style="width:95%; height:auto; margin: -10px 10px 7px; " src="images/miniroom.png" alt="">
+        </div>
+
+        <div class="comments">
+            <div class="header">
+                <p style="color: dodgerblue; font-family: 'NeoDunggeunmo Code';font-size:20px; margin-left:9px;">What
+                    Friends Say</p>
+                <img class="postingbtn" src="images/write.png" alt="" onclick="createPosting()">
+            </div>
+            <div class="comment">
+                <input style="width:40%;" type="text" id="username" placeholder="이름">
+                <input style="width:50%;" type="text" id="password" placeholder="비밀번호"> <br>
+                <input style="width:92.7%;" type="text" id="title" placeholder="제목"><br>
+                <textarea  id="content" style="width:93%; height:50px; resize: none; margin-top:3px;" placeholder="내용"></textarea>
+            </div>
+            <div class="postings" id="postings-box">
+            </div>
+
+
+
+        </div>
+
+
+
+    </div>
+</body>
+</html>
